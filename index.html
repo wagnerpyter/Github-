@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Repository Index</title>
+<style>
+body {
+  font-family: monospace;
+  background: #111;
+  color: #ddd;
+  padding: 40px;
+}
+a { color: #7df; text-decoration: none; }
+a:hover { text-decoration: underline; }
+</style>
+</head>
+
+<body>
+
+<h2>wagnerpyter repository</h2>
+<ul id="files"></ul>
+
+<script>
+
+const user = "SEUUSUARIO";
+const repo = "SEUREPO";
+
+fetch(`https://api.github.com/repos/${user}/${repo}/contents`)
+.then(res => res.json())
+.then(data => {
+
+  const list = document.getElementById("files");
+
+  data.forEach(file => {
+
+    const li = document.createElement("li");
+
+    const a = document.createElement("a");
+
+    if(file.type === "file"){
+      a.href = file.name;
+    } else {
+      a.href = file.name + "/";
+    }
+
+    a.textContent = file.name;
+
+    li.appendChild(a);
+    list.appendChild(li);
+
+  });
+
+});
+
+</script>
+
+</body>
+</html>
