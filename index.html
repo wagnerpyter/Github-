@@ -22,19 +22,25 @@ fetch("https://api.github.com/repos/wagnerpyter/wagnerpyter/contents/")
       const li = document.createElement("li");
       const a = document.createElement("a");
 
-      a.href = file.name;
+      // CORREÇÃO: Usar a URL de download direto do GitHub
+      a.href = file.download_url || file.html_url;
       a.textContent = file.name;
+      a.target = "_blank"; // Opcional: abre em nova aba
 
       li.appendChild(a);
       list.appendChild(li);
 
     });
 
+  })
+  .catch(error => {
+    console.error('Erro:', error);
+    document.getElementById("lista").innerHTML = '<li>Erro ao carregar arquivos</li>';
   });
 </script>
 
 </body>
-</html>
+</html></html>
 </body>
 </html>      const li = document.createElement("li");
       const a = document.createElement("a");
