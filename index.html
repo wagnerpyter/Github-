@@ -2,39 +2,45 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>arquivos</title>
+<title>π index</title>
+
+<style>
+body{
+  font-family: monospace;
+  background:#000;
+  color:#ddd;
+  padding:40px;
+}
+
+a{
+  color:#7B2D8B;
+  text-decoration:none;
+}
+</style>
+
 </head>
 
 <body>
 
-<h3>arquivos</h3>
-<ul id="lista"></ul>
+<h2>π arquivos</h2>
 
-<script>
-fetch("https://api.github.com/repos/wagnerpyter/wagnerpyter/contents/")
-  .then(res => res.json())
-  .then(files => {
+<ul>
 
-    const list = document.getElementById("lista");
+<li><a href="pi3.html">pi3</a></li>
+<li><a href="pi31.html">pi31</a></li>
+<li><a href="pi314.html">pi314</a></li>
+<li><a href="pi3141.html">pi3141</a></li>
+<li><a href="pi31415.html">pi31415</a></li>
+<li><a href="pi314159.html">pi314159</a></li>
+<li><a href="pi3141592.html">pi3141592</a></li>
+<li><a href="pi31415926.html">pi31415926</a></li>
+<li><a href="pi314159265.html">pi314159265</a></li>
+<li><a href="pi3141592653.html">pi3141592653</a></li>
 
-    files.forEach(file => {
+</ul>
 
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-
-      // CORREÇÃO: Usar a URL de download direto do GitHub
-      a.href = file.download_url || file.html_url;
-      a.textContent = file.name;
-      a.target = "_blank"; // Opcional: abre em nova aba
-
-      li.appendChild(a);
-      list.appendChild(li);
-
-    });
-
-  })
-  .catch(error => {
-    console.error('Erro:', error);
+</body>
+</html>    console.error('Erro:', error);
     document.getElementById("lista").innerHTML = '<li>Erro ao carregar arquivos</li>';
   });
 </script>
