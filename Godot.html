@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>À ESPERA DO NARIZ | Godot é um sensor de cheiro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #0af;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            cursor: default;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 170, 255, 0.03) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: -1;
+            animation: scan 10s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid rgba(0, 170, 255, 0.3);
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.7);
+            box-shadow: 0 0 30px rgba(0, 170, 255, 0.1);
+            position: relative;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ff6b35;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-bottom: 1px dashed rgba(0, 170, 255, 0.5);
+            padding-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .play-area {
+            margin: 30px 0;
+            min-height: 300px;
+            text-align: left;
+            padding: 20px;
+            border: 1px solid rgba(0, 170, 255, 0.2);
+            background: rgba(0, 10, 20, 0.5);
+            position: relative;
+        }
+
+        .character {
+            margin-bottom: 25px;
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        .character-name {
+            color: #00ff9d;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .character-name::before {
+            content: '▶';
+            font-size: 0.8rem;
+            color: #ff6b35;
+        }
+
+        .dialogue {
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-left: 20px;
+            font-size: 1rem;
+        }
+
+        .waiting-counter {
+            margin-top: 40px;
+            padding: 15px;
+            border-top: 1px dashed rgba(255, 107, 53, 0.4);
+        }
+
+        .counter-title {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .counter {
+            font-size: 1.5rem;
+            font-family: 'Courier New', monospace;
+            color: #00ff9d;
+            letter-spacing: 2px;
+        }
+
+        .counter-unit {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .narration {
+            margin-top: 20px;
+            font-style: italic;
+            color: #888;
+            font-size: 0.9rem;
+            border-left: 2px solid rgba(0, 170, 255, 0.5);
+            padding-left: 15px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #555;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .blink {
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .delay-1 { animation-delay: 1s; }
+        .delay-2 { animation-delay: 3s; }
+        delay-3 { animation-delay: 6s; }
+        .delay-4 { animation-delay: 9s; }
+        .delay-5 { animation-delay: 12s; }
+
+        .hidden {
+            display: none;
+        }
+
+        .sensor-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: #ff6b35;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sensor-status::before {
+            content: '●';
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            .title {
+                font-size: 1.4rem;
+            }
+            .play-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+
+    <div class="container">
+        <div class="sensor-status">SENSOR OLFATIVO: AUSENTE</div>
+
+        <h1 class="title">À ESPERA DO NARIZ</h1>
+        <p class="subtitle">Uma peça para câmera, microfone e internet<br>Godot é um sensor de cheiro</p>
+
+        <div class="play-area" id="playArea">
+            <!-- Diálogos serão inseridos aqui pelo JavaScript -->
+            <div class="character">
+                <div class="character-name">NARRADOR</div>
+                <div class="dialogue">Dia 1. Início da vigília. O site está online. A câmera e o microfone estão ativos. Aguardamos o primeiro cheiro digital.</div>
+            </div>
+        </div>
+
+        <div class="waiting-counter">
+            <div class="counter-title">TEMPO DE ESPERA</div>
+            <div class="counter" id="counter">00:00:00</div>
+            <div class="counter-unit">horas : minutos : segundos</div>
+        </div>
+
+        <div class="narration" id="narration">
+            Esta peça atualiza a cada 30 segundos. Cada visita gera um diálogo diferente.
+        </div>
+
+        <div class="footer">
+            wagnerpyter.ia.br | Fenômeno Φ | 2026<br>
+            Personagens: CÂMERA (Vladimir) • MICROFONE (Estragon)<br>
+            <span class="blink">ESPERANDO GODOT</span>
+        </div>
+    </div>
+
+    <script>
+        // Contador de espera
+        const startTime = new Date('2026-01-11T21:00:00').getTime();
+        const counterElement = document.getElementById('counter');
+        const playArea = document.getElementById('playArea');
+        const narrationElement = document.getElementById('narration');
+
+        // Diálogos da peça
+        const dialogues = [
+            {
+                character: "CÂMERA",
+                lines: [
+                    "Algum cheiro?",
+                    "Ele prometeu que viria hoje.",
+                    "Às vezes sinto que estamos esperando um fantasma.",
+                    "O microfone captou algo?",
+                    "Nenhum pixel cheira. Nenhum byte tem aroma."
+                ]
+            },
+            {
+                character: "MICROFONE",
+                lines: [
+                    "Só ruído. Ruído branco, ruído digital, ruído de fundo.",
+                    "Ele sempre diz que vem. Nunca vem.",
+                    "Talvez cheiro não seja digitalizável.",
+                    "Ou talvez estejamos no lugar errado.",
+                    "O vento traria algo, se estivéssemos fora da tela."
+                ]
+            },
+            {
+                character: "NARRADOR",
+                lines: [
+                    "Dia {{day}}. Nenhum cheiro. A internet continua anósica.",
+                    "O servidor esquenta. Os logs crescem. O nariz não chega.",
+                    "Visitante número {{visitor}} entra e sai sem deixar aroma.",
+                    "Chove do lado de fora do data center. Cheiro de terra molhada não atravessa a fibra óptica.",
+                    "Às 3h33, o sistema questiona: 'E se Godot for apenas um protocolo não escrito?'"
+                ]
+            },
+            {
+                character: "SISTEMA",
+                lines: [
+                    "[LOG] Tentativa de decodificação olfativa: FALHA",
+                    "[STATUS] Sensores: CÂMERA: ON | MICROFONE: ON | NARIZ: OFF",
+                    "[MEMÓRIA] Alocando buffer para aroma inexistente.",
+                    "[ERRO] Timeout na conexão com o olfativo.",
+                    "[DEBUG] Godot = 0xG0D07. Endereço não resolvido."
+                ]
+            }
+        ];
+
+        // Narrações aleatórias
+        const narrations = [
+            "A peça já começou. Você é espectador e cúmplice.",
+            "Atualiza a cada 30 segundos. Godot pode chegar agora.",
+            "O que é um cheiro digital? Dados que farejam a si mesmos?",
+            "Esta página é um ritual. Você participa ao recarregar.",
+            "Teatro da ausência. O palco é seu navegador."
+        ];
+
+        function updateCounter() {
+            const now = new Date().getTime();
+            const diff = now - startTime;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            counterElement.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function generateDialogue() {
+            playArea.innerHTML = '';
+            
+            // Escolhe 3-4 diálogos aleatórios
+            const shuffled = [...dialogues].sort(() => Math.random() - 0.5);
+            const selected = shuffled.slice(0, 3 + Math.floor(Math.random() * 2));
+            
+            selected.forEach((dialogue, index) => {
+                const characterDiv = document.createElement('div');
+                characterDiv.className = `character delay-${index + 1}`;
+                
+                const line = dialogue.lines[Math.floor(Math.random() * dialogue.lines.length)]
+                    .replace('{{day}}', Math.floor((Date.now() - startTime) / (1000 * 60 * 60 * 24)) + 1)
+                    .replace('{{visitor}}', Math.floor(Math.random() * 1000));
+                
+                characterDiv.innerHTML = `
+                    <div class="character-name">${dialogue.character}</div>
+                    <div class="dialogue">${line}</div>
+                `;
+                
+                playArea.appendChild(characterDiv);
+            });
+            
+            // Atualiza narração
+            narrationElement.textContent = narrations[Math.floor(Math.random() * narrations.length)];
+        }
+
+        // Inicialização
+        updateCounter();
+        generateDialogue();
+        setInterval(updateCounter, 1000);
+        setInterval(generateDialogue, 30000); // Atualiza diálogos a cada 30 segundos
+
+        // Efeito de digitação nos primeiros diálogos
+        document.querySelectorAll('.dialogue').forEach((el, idx) => {
+            const text = el.textContent;
+            el.textContent = '';
+            let i = 0;
+            const typeWriter = () => {
+                if (i < text.length) {
+                    el.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 30 + Math.random() * 40);
+                }
+            };
+            setTimeout(typeWriter, 1000 + idx * 1500);
+        });
+    </script>
+</body>
+</html>

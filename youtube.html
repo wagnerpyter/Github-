@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acervo Carlos Pronzato - Documentários no YouTube</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0a0a0a;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 3px solid #ff0000;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+        }
+
+        h1 {
+            color: #ff0000;
+            font-size: 2.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            color: #cccccc;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            color: #ff0000;
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .playlists {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 40px 0;
+            justify-content: center;
+        }
+
+        .playlist-btn {
+            background: #222;
+            color: white;
+            border: 2px solid #ff0000;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .playlist-btn:hover {
+            background: #ff0000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .playlist-btn.active {
+            background: #ff0000;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .video-card {
+            background: #1a1a1a;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #333;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 0, 0, 0.2);
+            border-color: #ff0000;
+        }
+
+        .video-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .video-card:hover .video-thumbnail img {
+            transform: scale(1.05);
+        }
+
+        .play-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background: rgba(255, 0, 0, 0.8);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-card:hover .play-icon {
+            opacity: 1;
+        }
+
+        .video-info {
+            padding: 20px;
+        }
+
+        .video-title {
+            color: #ffffff;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .video-stats {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .video-link {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: background 0.3s;
+            text-align: center;
+            width: 100%;
+        }
+
+        .video-link:hover {
+            background: #cc0000;
+        }
+
+        .youtube-channel {
+            text-align: center;
+            margin: 50px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #1a1a1a 0%, #222 100%);
+            border-radius: 15px;
+            border: 2px solid #333;
+        }
+
+        .channel-link {
+            display: inline-block;
+            background: #ff0000;
+            color: white;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .channel-link:hover {
+            background: #cc0000;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 0, 0, 0.4);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding: 30px;
+            border-top: 1px solid #333;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .video-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                display: block;
+            }
+            
+            .stat-item {
+                display: block;
+                margin: 15px 0;
+            }
+            
+            .playlists {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .playlist-btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Acervo Carlos Pronzato</h1>
+            <div class="subtitle">43 documentários sobre lutas sociais, memória política e América Latina</div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-number">12,7 mil</span>
+                    <span class="stat-label">Inscritos</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">43</span>
+                    <span class="stat-label">Documentários</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">199 mil</span>
+                    <span class="stat-label">Maior audiência</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="playlists">
+            <button class="playlist-btn active" onclick="filterVideos('all')">Todos os Vídeos</button>
+            <button class="playlist-btn" onclick="filterVideos('socioambiental')">Socioambiental</button>
+            <button class="playlist-btn" onclick="filterVideos('politica')">Política Latino-Americana</button>
+            <button class="playlist-btn" onclick="filterVideos('memoria')">Memória e História</button>
+            <button class="playlist-btn" onclick="filterVideos('educacao')">Educação e Mobilidade</button>
+        </div>
+
+        <div class="video-grid" id="videoContainer">
+            <!-- Vídeos serão carregados aqui via JavaScript -->
+        </div>
+
+        <div class="youtube-channel">
+            <h2 style="color: #ff0000; margin-bottom: 20px;">📺 CANAL NO YOUTUBE</h2>
+            <p style="color: #ccc; margin-bottom: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Acesse o canal completo do Carlos Pronzato no YouTube para mais documentários, 
+                atualizações e conteúdo exclusivo sobre movimentos sociais e política latino-americana.
+            </p>
+            <a href="https://www.youtube.com/@carlospronzato8658" class="channel-link" target="_blank">
+                🎬 Inscreva-se no Canal
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>Este site preserva e organiza o acervo audiovisual de Carlos Pronzato</p>
+            <p>Atualizado em Janeiro de 2026 | Código aberto: GitHub + Cloudflare</p>
+            <p style="margin-top: 20px; font-size: 0.8rem; color: #444;">
+                ℹ️ Clique em qualquer documentário para assistir diretamente no YouTube
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Dados dos vídeos do YouTube
+        const videos = [
+            {
+                id: 1,
+                title: "A BRASKEM PASSOU POR AQUI: A catástrofe de Maceió",
+                views: "199 mil",
+                years: "há 4 anos",
+                category: "socioambiental",
+                youtubeId: "VIDEO_ID_1",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_1/hqdefault.jpg"
+            },
+            {
+                id: 2,
+                title: "BOLÍVIA, A GUERRA DA ÁGUA",
+                views: "68 mil",
+                years: "há 5 anos",
+                category: "politica",
+                youtubeId: "VIDEO_ID_2",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_2/hqdefault.jpg"
+            },
+            {
+                id: 3,
+                title: "PIÑERA: A GUERRA CONTRA O CHILE",
+                views: "63 mil",
+                years: "há 5 anos",
+                category: "politica",
+                youtubeId: "VIDEO_ID_3",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_3/hqdefault.jpg"
+            },
+            {
+                id: 4,
+                title: "PADRE JÚLIO LANCELLOTTI, FÉ E REBELDIA",
+                views: "54 mil",
+                years: "há 4 anos",
+                category: "memoria",
+                youtubeId: "VIDEO_ID_4",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_4/hqdefault.jpg"
+            },
+            {
+                id: 5,
+                title: "NEM (NOVO ENSINO MÉDIO) - UM FRACASSO ANUNCIADO",
+                views: "43 mil",
+                years: "há 2 anos",
+                category: "educacao",
+                youtubeId: "VIDEO_ID_5",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_5/hqdefault.jpg"
+            },
+            {
+                id: 6,
+                title: "1917: A GREVE GERAL",
+                views: "29 mil",
+                years: "há 5 anos",
+                category: "memoria",
+                youtubeId: "VIDEO_ID_6",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_6/hqdefault.jpg"
+            },
+            {
+                id: 7,
+                title: "A REVOLTA DO BUZU",
+                views: "3,6 mil",
+                years: "há 2 anos",
+                category: "educacao",
+                youtubeId: "VIDEO_ID_7",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_7/hqdefault.jpg"
+            },
+            {
+                id: 8,
+                title: "CARLOS MARIGHELLA. QUEM SAMBA FICA, QUEM NÃO SAMBA VAI EMBORA",
+                views: "1,1 mil",
+                years: "há 2 anos",
+                category: "memoria",
+                youtubeId: "VIDEO_ID_8",
+                thumb: "https://img.youtube.com/vi/VIDEO_ID_8/hqdefault.jpg"
+            }
+        ];
+
+        function renderVideos(filter = 'all') {
+            const container = document.getElementById('videoContainer');
+            container.innerHTML = '';
+            
+            const filteredVideos = filter === 'all' 
+                ? videos 
+                : videos.filter(video => video.category === filter);
+            
+            filteredVideos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.setAttribute('data-category', video.category);
+                
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail">
+                        <img src="${video.thumb}" alt="${video.title}">
+                        <div class="play-icon">▶</div>
+                    </div>
+                    <div class="video-info">
+                        <h3 class="video-title">${video.title}</h3>
+                        <div class="video-stats">
+                            <span>${video.views} visualizações</span>
+                            <span>${video.years}</span>
+                        </div>
+                        <a href="https://www.youtube.com/watch?v=${video.youtubeId}" 
+                           class="video-link" 
+                           target="_blank">
+                            ASSISTIR NO YOUTUBE
+                        </a>
+                    </div>
+                `;
+                
+                container.appendChild(videoCard);
+            });
+        }
+
+        function filterVideos(category) {
+            // Atualizar botões ativos
+            document.querySelectorAll('.playlist-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Renderizar vídeos filtrados
+            renderVideos(category);
+        }
+
+        // Renderizar todos os vídeos inicialmente
+        renderVideos('all');
+    </script>
+</body>
+</html>
